@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "steelcloud-core",
+  "version": "${version}",
+  "name": "SteelCloud Core",
+  "description": "钢云纪元核心 API 契约层",
+  "authors": ["拉面", "乌龙"],
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.steelcloud.core.impl.SteelCloudCore"]
+  },
+  "custom": {
+    "steelcloud:core_api_version": "${core_api_version}"
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}
