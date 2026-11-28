@@ -8,6 +8,7 @@ import com.steelcloud.core.impl.content.materials.SteelCloudMaterials;
 import com.steelcloud.core.impl.currency.CurrencyServiceImpl;
 import com.steelcloud.core.impl.currency.PaymentServiceImpl;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,9 @@ public class SteelCloudCore implements ModInitializer {
 
         SteelCloudMaterials.register();
         SteelCloudCommand.register();
-        LOGGER.info("SteelCloud Core initialized (api_version={})", "0.1.0");
+        String version = FabricLoader.getInstance().getModContainer(MOD_ID)
+                .map(container -> container.getMetadata().getVersion().getFriendlyString())
+                .orElse("unknown");
+        LOGGER.info("SteelCloud Core initialized (version={})", version);
     }
 }
