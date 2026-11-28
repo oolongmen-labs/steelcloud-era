@@ -6,7 +6,7 @@ public class NoSuchAccountException extends IllegalArgumentException {
     private final UUID playerId;
 
     public NoSuchAccountException(UUID playerId) {
-        super("Error: selected player doesn't exist: " + playerId);
+        super("No economy account for player: " + playerId);
         this.playerId = playerId;
     }
 

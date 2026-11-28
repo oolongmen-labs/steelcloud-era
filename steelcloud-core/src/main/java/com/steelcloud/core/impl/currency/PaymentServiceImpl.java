@@ -30,16 +30,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResult pay(ServerPlayerEntity payer, ServerPlayerEntity payee,
                              Identifier currencyId, long amount) {
-        return doPay(payer.getInventory(), payer.getPos(), (ServerWorld) payer.getWorld(),
-                payee.getInventory(), payee.getPos(), (ServerWorld) payee.getWorld(),
+        return doPay(payer.getInventory(), payer.getPos(), payer.getServerWorld(),
+                payee.getInventory(), payee.getPos(), payee.getServerWorld(),
                 currencyId, amount);
     }
 
     @Override
     public PaymentResult payToInventory(ServerPlayerEntity payer, PlayerInventory payeeInv,
                                         Vec3d payeeDropPos, Identifier currencyId, long amount) {
-        ServerWorld payeeWorld = (ServerWorld) payer.getWorld();
-        return doPay(payer.getInventory(), payer.getPos(), (ServerWorld) payer.getWorld(),
+        ServerWorld payeeWorld = payer.getServerWorld();
+        return doPay(payer.getInventory(), payer.getPos(), payer.getServerWorld(),
                 payeeInv, payeeDropPos, payeeWorld, currencyId, amount);
     }
 
@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
         CurrencySpec spec = currencyService.getCurrency(currencyId).orElse(null);
         if (spec == null) return new PaymentResult.CurrencyNotRegistered(currencyId);
 
-        ServerWorld world = (ServerWorld) payee.getWorld();
+        ServerWorld world = payee.getServerWorld();
         // 用贪心生成退款方案（系统凭空生成，无找零限制）
         long remaining = amount;
         List<Denomination> denoms = spec.denominations();
@@ -199,7 +199,7 @@ public class PaymentServiceImpl implements PaymentService {
         for (int slot = 0; slot < inv.size() && !stack.isEmpty(); slot++) {
             ItemStack existing = inv.getStack(slot);
             if (existing.isEmpty()) continue;
-            if (!ItemStack.areItemsAndComponentsEqual(existing, stack)) continue;
+            if (!ItemStack.areEqual(existing, stack)) continue;
             int space = existing.getMaxCount() - existing.getCount();
             if (space <= 0) continue;
             int take = Math.min(space, stack.getCount());
