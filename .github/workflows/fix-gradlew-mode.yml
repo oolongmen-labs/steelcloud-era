@@ -1,0 +1,38 @@
+name: fix-gradlew-mode
+
+on:
+  push:
+    branches:
+      - chore/gradlew-exec-bit
+
+permissions:
+  contents: write
+
+jobs:
+  fix-mode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/gradlew-exec-bit
+          fetch-depth: 1
+
+      - name: Set executable bit and commit
+        run: |
+          echo 'before:'
+          git ls-files -s gradlew
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          # 关键：先真正 chmod 磁盘上的文件，git add 才会记录 100755
+          chmod +x gradlew
+          git rm -q .github/workflows/fix-gradlew-mode.yml
+          git add gradlew
+
+          git commit -m 'chore(build): 给 gradlew 补上可执行位 (100755)' \
+                    -m '仅修改文件模式，内容不变（blob 保持 249efbb）。'
+          git push origin HEAD:chore/gradlew-exec-bit
+
+          echo 'after:'
+          git ls-tree HEAD gradlew
