@@ -1,0 +1,44 @@
+name: fix-gradlew-mode
+
+on:
+  push:
+    branches:
+      - fix/core-compile-and-build
+
+permissions:
+  contents: write
+
+jobs:
+  fix-mode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/core-compile-and-build
+          fetch-depth: 1
+
+      - name: Record file mode
+        run: |
+          echo 'before:'
+          git ls-files -s gradlew
+          if git ls-files -s gradlew | grep -q '^100755'; then
+            echo 'MODE_OK'
+            echo "MODE_OK=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "MODE_OK=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set exec bit and remove this workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git update-index --chmod=+x gradlew
+          git rm -q .github/workflows/fix-gradlew-mode.yml
+
+      - name: Commit and push
+        run: |
+          git add gradlew
+          git commit -m 'chore(build): 给 gradlew 补上可执行位 (100755)' -m '按 Loom 构建要求，gradlew 需为可执行脚本；此提交仅改 mode，文件内容不变。'
+          git push origin HEAD:fix/core-compile-and-build
+          echo 'after:'
+          git ls-tree HEAD gradlew
